@@ -11,7 +11,7 @@ def coordinate_in_circle(coordinate):
     return (coordinate[0]**2 + coordinate[1]**2) <= 1
 
 
-def estimate_pi(iterations):
+def estimate_pi (iterations):
     darts_in = 0
 
     for i in range(0, iterations):
@@ -20,3 +20,8 @@ def estimate_pi(iterations):
 
     return darts_in/iterations*4
 
+
+def estimate_pi_blocks(total_calcs, blocks):
+    # Estima el valor de pi dividido en bloques
+    blocks_number = [int(total_calcs/blocks) for i in range(0, blocks)]
+    return sum(list(map(estimate_pi, blocks_number))) / blocks
