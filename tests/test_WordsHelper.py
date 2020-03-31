@@ -30,8 +30,7 @@ class Test(TestCase):
         # self.assert ?
 
     def test_remove_words(self):
-        stop_words = ('test', 'words')
-        full_text = ('Esta', 'frase', 'es', 'un', 'test', 'con', 'words')
-        filtered_words = remove_words(stop_words, full_text)
+        full_text = ('Esta', 'frase', 'es', 'un', 'test', 'con', 'palabras')
+        filtered_words = remove_words(full_text)
 
-        self.assertEqual(len(filtered_words), 5)
+        self.assertEqual(len(filtered_words), 4)

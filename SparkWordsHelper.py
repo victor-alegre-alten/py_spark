@@ -1,15 +1,8 @@
 import re
 import os
-from operator import add
-
 import unidecode
 import pandas
-from pyspark.sql import SparkSession
 
-
-def create_spark_session ():
-    MASTER = 'local[3]'
-    return SparkSession.builder.master(MASTER).appName('Word counter').getOrCreate()
 
 
 def read_text_file(filename):
@@ -57,10 +50,8 @@ def group_words(words_array):
         return None
 
 
-def remove_words(words_list):
+def remove_words(words_to_remove, words_list):
     # Quita las palabras dadas de un dataframe
-    words_to_remove = read_text_file('stopwords.txt')
-
     try:
         return list(
             filter(
@@ -72,25 +63,3 @@ def remove_words(words_list):
         return None
 
 
-if __name__ == '__main__':
-    session = create_spark_session()
-    text = [read_text_file('cuento.txt')]
-
-    #
-    rdd_texto_en_una_fila                           = session.sparkContext.parallelize(text)
-    rdd_una_fila_por_palabra                        = rdd_texto_en_una_fila.flatmap(split_words)
-    rdd_una_fila_por_palabra_sin_acentos            = rdd_una_fila_por_palabra.map(sanitize_text)
-    rdd_una_fila_por_palabra_sin_acentos_en_mayus   = rdd_una_fila_por_palabra_sin_acentos.map(lambda word: word.upper())
-
-    rdd_limpito = rdd_una_fila_por_palabra_sin_acentos_en_mayus.filter(remove_words)
-
-    rdd_dataframe = rdd_limpito.map(lambda palabra: (palabra, 1))
-
-    rdd = rdd_dataframe.reduceByKey(add)
-
-    lista_puntuada = rdd.collect()
-
-    for (palabra, ocurrencias) in lista_puntuada:
-        print('Palabra ->', palabra, ' :: Ocurrencias ->', ocurrencias)
-
-    session.stop()

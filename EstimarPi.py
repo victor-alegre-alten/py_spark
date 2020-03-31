@@ -42,6 +42,9 @@ def estimate_pi_spark(total_calcs, blocks):
     rdd = session.sparkContext.parallelize(blocks_calculation)
     total_sum = rdd.map(estimate_pi).reduce(lambda a, b: a + b)
 
+    # Cerramos la sesión
+    session.stop()
+
     return total_sum / blocks
 
 
