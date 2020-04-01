@@ -72,19 +72,27 @@ def remove_words(words_list):
         return None
 
 
+def remove_word(current_word):
+    global words_to_remove
+    return current_word not in words_to_remove
+
+
 if __name__ == '__main__':
     session = create_spark_session()
     text = [read_text_file('cuento.txt')]
 
+    # Quita las palabras dadas de un dataframe
+    words_to_remove = read_text_file('stopwords.txt')
+
     #
-    rdd_texto_en_una_fila                           = session.sparkContext.parallelize(text)
-    rdd_una_fila_por_palabra                        = rdd_texto_en_una_fila.flatmap(split_words)
-    rdd_una_fila_por_palabra_sin_acentos            = rdd_una_fila_por_palabra.map(sanitize_text)
-    rdd_una_fila_por_palabra_sin_acentos_en_mayus   = rdd_una_fila_por_palabra_sin_acentos.map(lambda word: word.upper())
+    rdd_texto_en_una_fila                          = session.sparkContext.parallelize(text)
+    rdd_una_fila_por_palabra                       = rdd_texto_en_una_fila.flatmap(split_words)
+    rdd_una_fila_por_palabra_sin_acentos           = rdd_una_fila_por_palabra.map(sanitize_text)
+    rdd_una_fila_por_palabra_sin_acentos_en_mayus  = rdd_una_fila_por_palabra_sin_acentos.map(lambda word: word.upper())
 
-    rdd_limpito = rdd_una_fila_por_palabra_sin_acentos_en_mayus.filter(remove_words)
+    rdd_limpito = rdd_una_fila_por_palabra_sin_acentos_en_mayus.filter(remove_word)
 
-    rdd_dataframe = rdd_limpito.map(lambda palabra: (palabra, 1))
+    rdd_dataframe = rdd_limpito.map(lambda pal: (pal, 1))
 
     rdd = rdd_dataframe.reduceByKey(add)
 
